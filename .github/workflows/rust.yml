@@ -10,6 +10,7 @@ env:
 
 jobs:
   build:
+    name: Building and testing
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,12 +34,18 @@ jobs:
         run: cargo clippy --all-targets --all-features
 
   msrv:
-    name: MSRV check
+    name: MSRV checks
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - run: cargo install cargo-msrv
-      - run: cargo msrv verify --path charming --rust-version 1.66
-      - run: cargo msrv verify --path charming --rust-version 1.79 -- cargo check -F ssr
-      - run: cargo msrv verify --path charming --rust-version 1.78 --target wasm32-unknown-unknown -- cargo check -F wasm
+      - name: html
+        if: always()
+        run: cargo msrv verify --path charming --rust-version 1.66
+      - name: ssr
+        if: always()
+        run: cargo msrv verify --path charming --rust-version 1.79 -- cargo check -F ssr
+      - name: wasm
+        if: always()
+        run: cargo msrv verify --path charming --rust-version 1.78 --target wasm32-unknown-unknown -- cargo check -F wasm
